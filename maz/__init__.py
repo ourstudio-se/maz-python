@@ -124,18 +124,13 @@ def compose(*functions):
 
     return functools.reduce(compose_pair, functions)
 
-def indexing(lst: list, index_item, default = None):
+def indexing(lst: list, index_item):
 
     """
         Indexing function, taking a list and what to
-        index, as such lst[index_item]. If index_item
-        not in lst, then default is returned.
+        index, as such lst[index_item].
     """
-
-    try:
-        return lst[index_item]
-    except:
-        return default
+    return lst[index_item]
 
 def invoke(fn, args: list = [], kwargs: dict = {}):
 
