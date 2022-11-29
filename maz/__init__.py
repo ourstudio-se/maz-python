@@ -39,7 +39,7 @@ def cached_execution(cache: dict, key: str, function: callable, *args, **kwargs)
 
     return cache, cache[key]
 
-def starzip(iterable: list):
+def starzip(iterables: list):
 
     """
         Calls zip with `iterable` as positional
