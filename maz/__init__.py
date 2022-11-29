@@ -15,8 +15,8 @@ def sorted_pos(iterable, key=None) -> iter:
 
     return sorted(iterable, key=key)
 
+
 def cached_execution(cache: dict, key: str, function: callable, *args, **kwargs) -> tuple:
-    
     """
         If key is in cache, cache[key] is returned, else
         function is executed and its result stored in cache.
@@ -39,7 +39,8 @@ def cached_execution(cache: dict, key: str, function: callable, *args, **kwargs)
 
     return cache, cache[key]
 
-def starzip(iterable: list):
+
+def starzip(iterables: list):
 
     """
         Calls zip with `iterable` as positional
@@ -47,6 +48,7 @@ def starzip(iterable: list):
     """
 
     return zip(*iterables)
+
 
 def pospartial(function, positional_arguments):
 
@@ -84,6 +86,7 @@ def pospartial(function, positional_arguments):
         return fn(*nargs, **kwargs)
     return wrapper
 
+
 class compose_pair:
     """
         Composes new function h = f(g(x)), from
@@ -110,6 +113,7 @@ class compose_pair:
             self.g(*args, **kwargs)
         )
 
+
 class compose:
 
     """
@@ -135,6 +139,7 @@ class compose:
 
     def __call__(self, *args, **kwargs):
         return self.fn(*args, **kwargs)
+
 
 class fnmap:
 
@@ -168,6 +173,7 @@ class fnmap:
             self.functions
         )
 
+
 def indexing(lst: list, index_item):
 
     """
@@ -175,6 +181,7 @@ def indexing(lst: list, index_item):
         index, as such lst[index_item].
     """
     return lst[index_item]
+
 
 def invoke(fn, args: list = [], kwargs: dict = {}):
 
@@ -192,6 +199,7 @@ def invoke(fn, args: list = [], kwargs: dict = {}):
 
     return fn(*args, **kwargs)
 
+
 def invoke_star(fn, *args, **kwargs):
     """
         Invokes function fn with positional arguments in args and
@@ -206,8 +214,10 @@ def invoke_star(fn, *args, **kwargs):
     """
     return invoke(fn, args, kwargs)
 
+
 def args2list(*args):
     return args
+
 
 def kwargs2dict(**kwargs):
     return kwargs
