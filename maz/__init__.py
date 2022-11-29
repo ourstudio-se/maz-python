@@ -1,7 +1,8 @@
 import functools
+import typing
 
 # functional composition functions
-def sorted_pos(iterable, key=None) -> iter:
+def sorted_pos(iterable, key=None) -> typing.Iterable:
 
     """
         Since python's "sorted" does not support positional
@@ -16,7 +17,7 @@ def sorted_pos(iterable, key=None) -> iter:
     return sorted(iterable, key=key)
 
 
-def cached_execution(cache: dict, key: str, function: callable, *args, **kwargs) -> tuple:
+def cached_execution(cache: dict, key: str, function: typing.Callable, *args, **kwargs) -> tuple:
     """
         If key is in cache, cache[key] is returned, else
         function is executed and its result stored in cache.
@@ -221,3 +222,45 @@ def args2list(*args):
 
 def kwargs2dict(**kwargs):
     return kwargs
+
+class fnexcept:
+
+    """
+        Wrapping a raising function to return the exception
+        as the second item in a tuple.
+
+        Examples
+        --------
+            >>> def raising(a: int):
+            ...     if a > 2:
+            ...         raise Exception("not allowed")
+            ...     return a+1
+            >>> raising_wrapper = fnexcept(raising, lambda: 0)
+            >>> raising_wrapper(3)
+            0
+
+            >>> def raising(a: int):
+            ...     if a > 2:
+            ...         raise Exception("not allowed")
+            ...     return a+1
+            >>> raising_wrapper = fnexcept(raising, lambda: 0)
+            >>> raising_wrapper(2)
+            2
+
+        Returns
+        -------
+            out : Callable
+    """
+
+    def __init__(self, raising_function, handler_function):
+        self.raising_function = raising_function
+        self.handler_function = handler_function
+
+    def __call__(self, *args, **kwargs) -> typing.Any:
+        try:
+            return self.raising_function(
+                *args,
+                **kwargs
+            )
+        except Exception as e:
+            return self.handler_function(*args, **kwargs)
