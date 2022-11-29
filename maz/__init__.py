@@ -72,8 +72,9 @@ def pospartial(function, positional_arguments):
         which yield
             res == 23+32+19 == 74
 
-        Return:
-            callable
+        Returns
+        -------
+            out : Callable
     """
 
     def wrapper(*args, fn=function, pas=positional_arguments, **kwargs):
@@ -83,8 +84,7 @@ def pospartial(function, positional_arguments):
         return fn(*nargs, **kwargs)
     return wrapper
 
-def compose_pair(f, g):
-
+class compose_pair:
     """
         Composes new function h = f(g(x)), from
         f and g.
@@ -96,33 +96,77 @@ def compose_pair(f, g):
             >>> h(1)
             >>> 4
 
-        Return:
-            Callable
+        Returns
+        -------
+            out : Callable
     """
-    def composed(*args, f=f, g=g, **kwargs):
-        return f(g(*args, **kwargs))
 
-    return composed
+    def __init__(self, f, g):
+        self.f = f
+        self.g = g
 
-def compose(*functions):
+    def __call__(self, *args, **kwargs):
+        return self.f(
+            self.g(*args, **kwargs)
+        )
+
+class compose:
 
     """
         Sequence composite functions of `functions`.
         E.g. let fns be a list of functions [f, g, h] and
         compose(fns) would then represent lambda x : f(g(h(x)))
 
-        Example:
+        Examples
+        --------
             >>> inc = lambda x: x+1
             >>> double = lambda x: x*2
             >>> f = compose(inc, double, inc)
             >>> f(2)
-            >>> 7
+            7
 
-        Return:
-            function
+        Returns
+        -------
+            out : Callable
     """
 
-    return functools.reduce(compose_pair, functions)
+    def __init__(self, *functions):
+        self.fn = functools.reduce(compose_pair, functions)
+
+    def __call__(self, *args, **kwargs):
+        return self.fn(*args, **kwargs)
+
+class fnmap:
+
+    """
+        Runs an iterable of functions with same arguments.
+        Returns an iterable of result from each of the functions.
+
+        Examples
+        --------
+            >>> fn = fnmap(lambda x: x+1, lambda x: x+2)
+            >>> list(fn(3))
+            [4, 5]
+
+            >>> def add_one(x): return x+1
+            >>> def mul_two(x): return x*2
+            >>> fn = fnmap(add_one, mul_two)
+            >>> list(fn(x=3))
+            [4, 6]
+
+        Returns
+        -------
+            out : Callable
+    """
+
+    def __init__(self, *functions):
+        self.functions = functions
+    
+    def __call__(self, *args, **kwargs):
+        return map(
+            lambda fn: fn(*args, **kwargs),
+            self.functions
+        )
 
 def indexing(lst: list, index_item):
 
