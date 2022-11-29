@@ -64,3 +64,13 @@ def test_pospartial():
 
     _f = maz.pospartial(f, [(1, 32), (2, 19)])
     assert _f(23) == 74
+
+def test_fnmap():
+
+    fn = maz.fnmap(lambda x: x+1, lambda x: x+2)
+    assert list(fn(3)) == [4, 5]
+
+    def add_one(x): return x+1
+    def mul_two(x): return x*2
+    fn = maz.fnmap(add_one, mul_two)
+    assert list(fn(x=3)) == [4, 6]
