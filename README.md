@@ -49,4 +49,9 @@ maz.invoke_star(add, 1, 2) # >>> 3
 lst = [[2,1], [1,0], [3,0]]
 maz.sorted_pos(lst, operator.itemgetter(0)) # >>> [[1,0], [2,1], [3,0]]
 
+# "fnmap" function will compute all input functions in a 
+# series with same given arguments 
+fn = maz.fnmap(add, add, add)
+fn(1,2) # >>> [3, 3, 3]
+
 ```
