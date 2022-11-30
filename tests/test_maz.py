@@ -81,3 +81,15 @@ def test_fnmap():
     def mul_two(x): return x * 2
     fn = maz.fnmap(add_one, mul_two)
     assert list(fn(x=3)) == [4, 6]
+
+
+def test_fnexcept():
+
+    def raising(a: int):
+        if a > 2:
+            raise Exception("not allowed")
+        return a+1
+
+    raising_wrapper = maz.fnexcept(raising, lambda _: 0)
+    assert raising_wrapper(3) == 0
+    assert raising_wrapper(2) == 3
