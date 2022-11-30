@@ -15,6 +15,6 @@ jobs:
       - run: python3 -m pip install --upgrade build && python3 -m build
 
       - name: Publish package to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
+        uses: yaananth/twine-upload@v1
+        env:
+          SECRETS: ${{ secrets.PYPI_API_TOKEN }}
