@@ -93,3 +93,37 @@ def test_fnexcept():
     raising_wrapper = maz.fnexcept(raising, lambda _: 0)
     assert raising_wrapper(3) == 0
     assert raising_wrapper(2) == 3
+
+
+def test_filter_concat():
+
+    class Var:
+        def __init__(self, id: str, n: int):
+            self.id = id
+            self.n = n
+        
+        def __eq__(self, o):
+            return (self.id == o.id) and (self.n == o.n)
+
+    items = [
+        Var("a", 1),
+        Var("b", 2),
+        Var("c", 3),
+        Var("d", 4),
+        Var("e", 5),
+    ]
+
+    fmc_fn = maz.filter_map_concat(
+        lambda x: x.n > 2,
+        lambda x: Var(x.id, x.n+1),
+        lambda x: Var(x.id, x.n-1)
+    )
+    actual = list(fmc_fn(items))
+    expected = [
+        Var("a", 0),
+        Var("b", 1),
+        Var("c", 4),
+        Var("d", 5),
+        Var("e", 6),
+    ]
+    assert actual == expected

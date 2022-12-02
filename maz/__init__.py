@@ -1,5 +1,7 @@
 import functools
 import typing
+import operator
+import itertools
 
 # functional composition functions
 def sorted_pos(iterable, key=None) -> typing.Iterable:
@@ -264,3 +266,86 @@ class fnexcept:
             )
         except Exception as e:
             return self.handler_function(*args, **kwargs)
+
+
+class filter_map_concat:
+
+    """
+
+        Takes three functions as input and returns a filter, map and concat function composition.
+        First the first predicate function is applied to all elements where for the one elements yielding
+        true will then propagate on to the second function. The one elements yielding false will propagate to 
+        the second function. At the end, all elements are concatenated into a new iterator where order is kept.
+
+              output
+                |
+                |
+        concat  x ----o  (order is kept)
+                |     |
+                |     |
+         map T  x     x  map F
+                |     |
+                |     |
+        filter  o --- o
+                |
+                |  
+              input
+
+        Parameters
+        ----------
+            filter_predicate : Callable[[Any], bool]
+                A predicate function taking `Any` object as input and outputs a bool
+
+            tmap_function : Callable[[Any], Any]
+                A function mapping the one object's that yielded TRUE from filter_predicate to another object. As default there's a dummy function that just returns the same object.
+
+            fmap_function : Callable[[Any], Any]
+                A function mapping the one object's that yielded FALSE from filter_predicate to another object. As default there's a dummy function that just returns the same object.
+
+        Returns
+        -------
+            out : Callable[[Iterator[Any]], Iterator[Any]]
+
+    """
+
+    def __init__(
+        self, 
+        filter_predicate: typing.Callable[[typing.Any], bool],
+        tmap_function: typing.Callable[[typing.Any], typing.Any] = lambda x: x,
+        fmap_function: typing.Callable[[typing.Any], typing.Any] = lambda x: x,
+    ):
+        self.filter_predicate = filter_predicate
+        self.tmap_function = tmap_function
+        self.fmap_function = fmap_function
+
+    def __call__(self, objects: typing.Iterable[typing.Any]) -> typing.Iterable[typing.Any]:
+        return map(
+            operator.itemgetter(1),
+            sorted(
+                itertools.chain(
+                    map(
+                        lambda x: (x[0], self.tmap_function(x[1])),
+                        filter(
+                            compose(
+                                self.filter_predicate,
+                                operator.itemgetter(1),
+                            ),
+                            enumerate(objects)
+                        ),
+                    ),
+                    
+                    map(
+                        lambda x: (x[0], self.fmap_function(x[1])),
+                        filter(
+                            compose(
+                                operator.not_,
+                                self.filter_predicate,
+                                operator.itemgetter(1),
+                            ),
+                            enumerate(objects)
+                        ),
+                    )
+                ),
+                key=operator.itemgetter(0),
+            )
+        )
