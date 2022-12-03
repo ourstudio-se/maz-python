@@ -319,6 +319,7 @@ class filter_map_concat:
         self.fmap_function = fmap_function
 
     def __call__(self, objects: typing.Iterable[typing.Any]) -> typing.Iterable[typing.Any]:
+        objects_t, objects_f = itertools.tee(objects)
         return map(
             operator.itemgetter(1),
             sorted(
@@ -330,7 +331,7 @@ class filter_map_concat:
                                 self.filter_predicate,
                                 operator.itemgetter(1),
                             ),
-                            enumerate(objects)
+                            enumerate(objects_t)
                         ),
                     ),
                     
@@ -342,7 +343,7 @@ class filter_map_concat:
                                 self.filter_predicate,
                                 operator.itemgetter(1),
                             ),
-                            enumerate(objects)
+                            enumerate(objects_f)
                         ),
                     )
                 ),
