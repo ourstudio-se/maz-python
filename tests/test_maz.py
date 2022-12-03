@@ -105,13 +105,13 @@ def test_filter_concat():
         def __eq__(self, o):
             return (self.id == o.id) and (self.n == o.n)
 
-    items = [
+    items = iter([
         Var("a", 1),
         Var("b", 2),
         Var("c", 3),
         Var("d", 4),
         Var("e", 5),
-    ]
+    ])
 
     fmc_fn = maz.filter_map_concat(
         lambda x: x.n > 2,
