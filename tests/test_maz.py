@@ -127,3 +127,40 @@ def test_filter_concat():
         Var("e", 6),
     ]
     assert actual == expected
+
+def test_ifttt_function():
+
+    class Var:
+        def __init__(self, id: str, n: int):
+            self.id = id
+            self.n = n
+        
+        def __eq__(self, o):
+            return (self.id == o.id) and (self.n == o.n)
+
+    items = [
+        Var("a", 1),
+        Var("b", 2),
+        Var("c", 3),
+        Var("d", 4),
+        Var("e", 5),
+    ]
+
+    actual = list(
+        map(
+            maz.ifttt(
+                lambda x: x.n > 2,
+                lambda x: Var(x.id, x.n+1),
+                lambda x: Var(x.id, x.n-1)
+            ),
+            items
+        )
+    )
+    expected = [
+        Var("a", 0),
+        Var("b", 1),
+        Var("c", 4),
+        Var("d", 5),
+        Var("e", 6),
+    ]
+    assert actual == expected

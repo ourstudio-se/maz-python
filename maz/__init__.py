@@ -350,3 +350,16 @@ class filter_map_concat:
                 key=operator.itemgetter(0),
             )
         )
+
+class ifttt:
+
+    def __init__(self, fnif, fnthen, fnelse):
+        self.fnif = fnif
+        self.fnthen = fnthen
+        self.fnelse = fnelse
+
+    def __call__(self, obj: typing.Any) -> typing.Any:
+        if self.fnif(obj):
+            return self.fnthen(obj)
+        else:
+            return self.fnelse(obj)
