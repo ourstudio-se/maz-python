@@ -45,13 +45,22 @@ def add(x,y):
 maz.invoke(add, [1,2]) # >>> 3
 maz.invoke_star(add, 1, 2) # >>> 3
 
-# "sorted_pos" function - since `sorted` doesn't support positional arguments (yes, weird right?)
-lst = [[2,1], [1,0], [3,0]]
-maz.sorted_pos(lst, operator.itemgetter(0)) # >>> [[1,0], [2,1], [3,0]]
-
 # "fnmap" function will compute all input functions in a 
 # series with same given arguments 
 fn = maz.fnmap(add, add, add)
 fn(1,2) # >>> [3, 3, 3]
+
+# "ifttt" returns a new function that checks the input somehow
+# then does something depending on the result from the check
+fn = maz.ifttt(
+    # if x is greater than 3,
+    lambda x: x > 3,
+    # then subtract 1 from x
+    lambda x: x - 1,
+    # else add 1 to x
+    lambda x: x + 1
+)
+fn(3) # >>> 4
+fn(4) # >>> 3
 
 ```
