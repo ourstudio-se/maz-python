@@ -186,3 +186,19 @@ def test_partialpos():
 
     with pytest.raises(Exception):
         assert maz.partialpos(f, {1:2})()
+
+def test_starfilter():
+
+    assert list(
+        maz.starfilter(
+            lambda x,y: x+y >= 4,
+            [(1,2),(2,3),(3,4),(4,5)]
+        )
+    ) == [(2,3),(3,4),(4,5)]
+
+def test_constant():
+
+    cnst_fn = maz.constant(True)
+    assert cnst_fn(0) == True
+    assert cnst_fn("hello") == True
+    assert cnst_fn(lambda x: x+1) == True

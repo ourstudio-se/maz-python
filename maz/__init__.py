@@ -475,3 +475,25 @@ class ifttt:
             return self.fnthen(*args, **kwargs)
         else:
             return self.fnelse(*args, **kwargs)
+
+def starfilter(function, iterable):
+    
+    """
+        As built in `filter` but function is called with each item in iterable as a starred argument.
+    """
+    return filter(
+        lambda x: function(*x),
+        iterable,
+    )
+
+class constant:
+
+    """
+        Returns a function which returns `val`.
+    """
+
+    def __init__(self, val):
+        self.val = val
+
+    def __call__(self, *args, **kwargs):
+        return self.val
