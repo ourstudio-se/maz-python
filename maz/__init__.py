@@ -1,3 +1,4 @@
+import inspect
 import functools
 import typing
 import operator
@@ -56,6 +57,8 @@ def starzip(iterables: list):
 def pospartial(function, positional_arguments):
 
     """
+        DEPRECATED. Use partialpos instead.
+
         `pospartial` is a complementing function to functools.partial, where
         one can say which positional argument should be hardcoded into function.
         Usually, this is solved by instead setting a keyword argument and thus
@@ -89,6 +92,71 @@ def pospartial(function, positional_arguments):
         return fn(*nargs, **kwargs)
     return wrapper
 
+class partialpos:
+
+    """
+        Return a new partial function object which when called behave like
+        `function` called with positional arguments given in `positional_arguments`.
+        Each key `i` corresponds to the `i`'th argument in `function`.
+
+    """
+
+    def __init__(self, function, positional_arguments: typing.Dict[int, typing.Any]):
+        self.function = function
+        self.positional_arguments = positional_arguments
+
+    def _defaults(self) -> dict:
+        return dict(
+            itertools.starmap(
+                lambda k,v: (
+                    self.function.__code__.co_varnames.index(k), 
+                    v.default
+                ),
+                filter(
+                    compose(
+                        lambda x: x is not inspect.Parameter.empty,
+                        operator.attrgetter("default"),
+                        operator.itemgetter(1),
+                    ),
+                    inspect.signature(self.function).parameters.items()
+                )
+            )
+        )
+
+    def __call__(self, *args, **kwargs):
+
+        # First we collect function's default arguments,
+        # all positional arguments hard coded in self.positional_arguments
+        # and then given from kwargs input. It is also priorized in that order,
+        # so if e.g. default value on argument a=1, but user gives a=2 in kwargs,
+        # then a=2 is what will be calculated on.
+        # Finally will append the positional arguments given from
+        # user into function. So the experience will be as if it is
+        # calling any other function. 
+
+        left = set(range(len(self.function.__code__.co_varnames))).difference(self.positional_arguments.keys())        
+        return self.function(
+            *map(
+                operator.itemgetter(1),
+                sorted(
+                    dict(
+                        itertools.chain(
+                            self._defaults().items(),
+                            self.positional_arguments.items(),
+                            itertools.starmap(
+                                lambda k,v: (
+                                    self.function.__code__.co_varnames.index(k),
+                                    v
+                                ),
+                                kwargs.items(),
+                            ),
+                            zip(left, args)
+                        )
+                    ).items(),
+                    key=operator.itemgetter(0),
+                )
+            )
+        )
 
 class compose_pair:
     """
@@ -228,8 +296,16 @@ def kwargs2dict(**kwargs):
 class fnexcept:
 
     """
-        Wrapping a raising function to return the exception
-        as the second item in a tuple.
+        Wrapping a raising function and a handler function that
+        returns an alternative to the exception.
+
+        Parameters
+        ----------
+            raising_function: Callable
+                a function that may raise exceptions for perticular input values
+
+            handler_function: Callable
+                a function, taking same arguments as raising_function, returning some alternative value
 
         Examples
         --------
@@ -246,7 +322,7 @@ class fnexcept:
             ...         raise Exception("not allowed")
             ...     return a+1
             >>> raising_wrapper = fnexcept(raising, lambda: 0)
-            >>> raising_wrapper(2)
+            >>> raising_wrapper(1)
             2
 
         Returns
@@ -264,7 +340,7 @@ class fnexcept:
                 *args,
                 **kwargs
             )
-        except Exception as e:
+        except:
             return self.handler_function(*args, **kwargs)
 
 
@@ -353,13 +429,71 @@ class filter_map_concat:
 
 class ifttt:
 
+    """
+        Returns a function object that will evaluate `fnif` first.
+        If it evaluated to true, then `fnthen` will be called, or else
+        `fnelse` will be called. `fnif`, `fnthen` and `fnelse` all has 
+        the same function signature.
+
+        Parameters
+        ----------
+            fnif: Callable[typing.Any, bool]
+                a predicate function returning true or false
+
+            fnthen: Callable[typing.Any, typing.Any]
+                any function object 
+
+            fnelse: Callable[typing.Any, typing.Any]
+                any function object 
+
+        Examples
+        --------
+            >>> list(
+            ...     map(
+            ...         ifttt(
+            ...             lambda x: x > 2, # if number is greater than 2
+            ...             lambda x: x + 1, # then add by 1
+            ...             lambda x: x - 1  # else subtract by 1
+            ...         ),
+            ...         range(5)
+            ...     )    
+            ... )
+            [-1, 0, 1, 4, 5]
+
+        Returns
+        -------
+            out : Callable[Any, Any]
+    """
+
     def __init__(self, fnif, fnthen, fnelse):
         self.fnif = fnif
         self.fnthen = fnthen
         self.fnelse = fnelse
 
-    def __call__(self, obj: typing.Any) -> typing.Any:
-        if self.fnif(obj):
-            return self.fnthen(obj)
+    def __call__(self, *args, **kwargs) -> typing.Any:
+        if self.fnif(*args, **kwargs):
+            return self.fnthen(*args, **kwargs)
         else:
-            return self.fnelse(obj)
+            return self.fnelse(*args, **kwargs)
+
+def starfilter(function, iterable):
+    
+    """
+        As built in `filter` but function is called with each item in iterable as a starred argument.
+    """
+    return filter(
+        lambda x: function(*x),
+        iterable,
+    )
+
+class constant:
+
+    """
+        Returns a function which returns `val`.
+    """
+
+    def __init__(self, val):
+        self.val = val
+
+    def __call__(self, *args, **kwargs):
+        return self.val

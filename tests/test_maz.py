@@ -1,6 +1,7 @@
+import functools
 import maz
 import operator
-import functools
+import pytest
 
 
 def test_compose():
@@ -164,3 +165,40 @@ def test_ifttt_function():
         Var("e", 6),
     ]
     assert actual == expected
+
+def test_partialpos():
+
+    def f(a,b,c,d=1):
+        return 1*a + 2*b + 3*c + 4*d
+
+    assert maz.partialpos(f, {1:2, 2:2})(1,2) == 1*1 + 2*2 + 3*2 + 4*2
+    assert maz.partialpos(f, {1:2, 2:2})(1)   == 1*1 + 2*2 + 3*2 + 4*1
+    assert maz.partialpos(f, {1:2, 3:3})(1,3) == 1*1 + 2*2 + 3*3 + 4*3
+
+    def f(a,b):
+        return a+b
+
+    assert maz.partialpos(f, {1: 2})(1) == 3
+    assert maz.partialpos(f, {1: 2})(1,2) == 3
+
+    with pytest.raises(Exception):
+        assert maz.partialpos(f, {"1":2})(1)
+
+    with pytest.raises(Exception):
+        assert maz.partialpos(f, {1:2})()
+
+def test_starfilter():
+
+    assert list(
+        maz.starfilter(
+            lambda x,y: x+y >= 4,
+            [(1,2),(2,3),(3,4),(4,5)]
+        )
+    ) == [(2,3),(3,4),(4,5)]
+
+def test_constant():
+
+    cnst_fn = maz.constant(True)
+    assert cnst_fn(0) == True
+    assert cnst_fn("hello") == True
+    assert cnst_fn(lambda x: x+1) == True
