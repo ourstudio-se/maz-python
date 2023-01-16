@@ -35,10 +35,6 @@ import maz
 import operator
 import itertools
 
-# "indexing" function - since only way to index a list in python is to do lst[x]
-lst = [2,1,3]
-maz.indexing(lst, 0) # >>> 2
-
 # "invoke" function - a function calling other functions
 def add(x,y): 
     return x+y
