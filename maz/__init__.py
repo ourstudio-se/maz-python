@@ -245,15 +245,6 @@ class fnmap:
         )
 
 
-def indexing(lst: list, index_item):
-
-    """
-        Indexing function, taking a list and what to
-        index, as such lst[index_item].
-    """
-    return lst[index_item]
-
-
 def invoke(fn, args: list = [], kwargs: dict = {}):
 
     """
