@@ -41,7 +41,7 @@ class waiting:
 
     def __call__(self, *args, **kwargs):
         sleep(self.in_seconds)
-        return self.functions(*args, **kwargs)
+        return self.function(*args, **kwargs)
 
 class named:
 
