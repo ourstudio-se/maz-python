@@ -1,6 +1,6 @@
 import time
 from functools import partial
-from maz.compositions import retry_until, timout
+from maz.compositions import retry_until, timeout
 
 def test_retryer():
 
