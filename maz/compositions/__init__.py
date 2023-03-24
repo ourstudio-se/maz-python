@@ -1,57 +1,55 @@
-
 from dataclasses import dataclass
 from typing import Callable, Any
 from time import sleep
+from functools import partial
+from maz import compose
 
-@dataclass
-class Retryer:
+class retry_until:
 
     """
         Calls input function until condition is met
         or number of retries equals `retries`.
     """
 
-    retries:        int
-    condition:      Callable[[Any], bool]
+    def __init__(self, function, retries: int, condition: Callable[[Any], bool]):
+        if retries < 1:
+            raise ValueError(f"`retries` must be greater or equal to 1, got {retries}")
 
-    def __call__(self, function, *args, **kwargs):
+        self.function = function
+        self.retries = retries
+        self.condition = condition
 
-        ntry = 0
-        result = function(*args, **kwargs)
-        while not self.condition(result) and ntry < self.retries:
-            result = function(*args, **kwargs)
-            ntry += 1
+    def __call__(self, *args, **kwargs):
+
+        for i in range(self.retries):
+            result = self.function(*args, **kwargs)
+            if self.condition(result):
+                return result
 
         return result
 
-
-@dataclass
-class ExecuteAndTimeout:
+def timeout(function, timeout: float):
 
     """
         Calls function then suspends execution of the current
         thread for the given number of seconds (timeout).
     """
+    return compose(
+        partial(
+            sleep,
+            timeout,
+        ),
+        function
+    )
 
-    fn:         Callable[[Any], Any]
-    timeout:    float
-    
-    def __call__(self, *args, **kwargs):    
-        result = self.fn(*args, **kwargs)
-        sleep(self.timeout)
-        return result
-
-
-
-@dataclass
-class Property:
+class named:
 
     """
-        Names a given function
+        Returns an object with properties name and function.
     """
 
     name: str
-    fn: Callable[[Any], Any]
+    function: Callable[[Any], Any]
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
-        return self.fn(args, kwds)
+        return self.function(args, kwds)
