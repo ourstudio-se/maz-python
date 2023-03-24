@@ -1,6 +1,6 @@
 import time
 from functools import partial
-from maz.compositions import retry_until, timeout
+from maz.compositions import retry_until, waiting
 
 def test_retryer():
 
@@ -28,12 +28,12 @@ def test_retryer():
 
 def test_timeout():
 
-    timeout_fn = timeout(
+    waiting_fn = waiting(
         lambda x: x+1,
         1.1,
     )
 
     start_time = time.time()
-    assert timeout_fn(3) == 4
+    assert waiting_fn(3) == 4
     total_time = time.time()-start_time
     assert total_time > 1

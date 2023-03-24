@@ -28,19 +28,20 @@ class retry_until:
 
         return result
 
-def timeout(function, timeout: float):
+class waiting:
+    
+    """
+        Returns a new function that when executed will wait `in_seconds` seconds 
+        before executing the original function.
+    """
 
-    """
-        Calls function then suspends execution of the current
-        thread for the given number of seconds (timeout).
-    """
-    return compose(
-        partial(
-            sleep,
-            timeout,
-        ),
-        function
-    )
+    def __init__(self, function, in_seconds: float):
+        self.function = function
+        self.in_seconds = in_seconds
+
+    def __call__(self, *args, **kwargs):
+        sleep(self.in_seconds)
+        return self.functions(*args, **kwargs)
 
 class named:
 
