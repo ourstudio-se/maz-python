@@ -36,11 +36,6 @@ def test_pospartial():
     assert _f(23) == 74
 
 
-def test_indexing():
-    lst = [2, 1, 3]
-    assert maz.indexing(lst, 0) == 2
-
-
 def test_invoke():
     def add(x, y):
         return x + y
