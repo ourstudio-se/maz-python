@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, Any
+from typing import Callable, Any, Optional
 from time import sleep
 from functools import partial
 from maz import compose
@@ -7,7 +7,7 @@ from maz import compose
 class retry_until:
 
     """
-        Calls input function until condition is met
+        Calls input function until condition is true
         or number of retries equals `retries`.
     """
 
@@ -52,5 +52,5 @@ class named:
     name: str
     function: Callable[[Any], Any]
 
-    def __call__(self, *args: Any, **kwds: Any) -> Any:
+    def __call__(self, *args, **kwds) -> Any:
         return self.function(args, kwds)
