@@ -477,6 +477,14 @@ def starfilter(function, iterable):
         iterable,
     )
 
+def starzip(iterables):
+
+    """
+        Prepends `*` to `iterables` and calls `zip` on it.
+    """
+
+    return zip(*iterables)
+
 class constant:
 
     """
@@ -488,3 +496,46 @@ class constant:
 
     def __call__(self, *args, **kwargs):
         return self.val
+
+def nonefilter(iterable):
+
+    """
+        Returns a filter object that filters out all `None` values.
+    """
+
+    return filter(
+        lambda x: x is not None,
+        iterable,
+    )
+
+def concat(*functions):
+
+    """
+        Returns a new function taking equal many arguments as there are functions.
+        Each argument is called with its corresponding function.
+    """
+    def wrapper(*args):
+        return tuple(
+            map(
+                lambda fn, arg: fn(arg),
+                functions,
+                args,
+            )
+        )
+    return wrapper
+
+def starconcat(*functions):
+    
+    """
+        Returns a new function taking equal many arguments as there are functions.
+        Each argument is called with its corresponding function using star (*) call.
+    """
+    def wrapper(*args):
+        return tuple(
+            map(
+                lambda fn, arg: fn(*arg),
+                functions,
+                args,
+            )
+        )
+    return wrapper

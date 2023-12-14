@@ -1,3 +1,24 @@
+[tool.poetry]
+name = "maz"
+version = "0.0.11"
+description = "Functional programming tools."
+authors = ["Rikard Olsson <rikard@ourstudio.se>"]
+readme = "README.md"
+packages = [{include = "maz"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^6.0.0"
+
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
