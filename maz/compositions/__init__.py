@@ -1,8 +1,5 @@
-from dataclasses import dataclass
-from typing import Callable, Any, Optional
+from typing import Callable, Any
 from time import sleep
-from functools import partial
-from maz import compose
 
 class retry_until:
 

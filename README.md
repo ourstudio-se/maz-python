@@ -12,8 +12,8 @@ You can use `maz` to compose function calls such that they call one another in a
 **NOTE:** functions are called from right to left.
 ```python
 >>> import maz
->>> inc = lambda x: x+1
->>> add_three = maz.compose(inc,inc,inc)
+>>> succ = lambda x: x+1
+>>> add_three = maz.compose(succ,succ,succ)
 >>> add_three(4)
 >>> 7
 ```
@@ -28,7 +28,7 @@ When you want to fix a parameter in a function, you could just use the `functool
 >>> 5
 ```
 
-### Other functionalities
+### Complex compositions
 To support more complex compositions we've added some special functions such as
 ```python
 import maz
@@ -78,3 +78,25 @@ cnst_fn() # >>> True
 cnst_fn(cnst_fn()) # >>> True
 
 ```
+
+## Other functions
+We've added a `tools` module to provide functions that are in the middle of being simple enough to just write it yourself but tideous enough to not do it.
+```python
+
+from maz.tools import reverse_otm_dict
+
+# Reversing a one-to-many relationship map
+d = reverse_otm_dict({
+    "a": [1,2,3],
+    "b": [1,2,4],
+    "c": [4,5]
+})
+
+# >>> d
+# {
+#     1: frozenset({"a", "b"}),
+#     2: frozenset({"a", "b"}),
+#     3: frozenset({"a"}),
+#     4: frozenset({"b", "c"}),
+#     5: frozenset({"c"}),
+# }
