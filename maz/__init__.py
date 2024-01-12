@@ -539,3 +539,9 @@ def starconcat(*functions):
             )
         )
     return wrapper
+
+def identity(x):
+    """
+        Returns input as output.
+    """
+    return x
